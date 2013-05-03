@@ -1,0 +1,294 @@
+
+
+<html >
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800|Quattrocento|Sorts+Mill+Goudy' rel='stylesheet' type='text/css'>
+		<link href="bootstrap.min.css" rel="stylesheet">
+		<link href="bootstrap-responsive.min.css" rel="stylesheet">
+		<style>
+			html,body {
+				height:100%;
+				font-family:"Open Sans", sans-serif;
+				overflow: hidden;
+			}
+			h1 {
+				font-family: "Sorts Mill Goudy", serif;
+				font-size:70px;
+				
+				line-height:70px;
+				color:#e25226;
+			}
+			h3 {
+				font-size:45px;
+				text-transform: italic;
+				font-weight:normal;
+				font-family: times new roman;
+				font-style: italic;
+				
+			}
+			ul.slides {
+				margin:0;
+				font-size:50px;
+				top:0;
+				bottom:0;
+				left:0;
+				right:0;
+				position:absolute;
+				vertical-align:middle;
+			}
+			ul.slides li {
+				line-height:70px;
+				height:100%;
+				color: #e7ebe8;
+				text-align:center;
+				background:#333;
+				display:table;
+				width:100%;
+			}
+
+			ul.bullets {
+				margin-top:30px;
+				padding-top:10px;
+				border-top: 5px dashed #555;
+			}
+
+			ul.slides .content {
+				display:table-cell;
+				vertical-align: middle;
+			}
+
+			.total-pages {
+				text-align: center;
+				width:100%;
+				font-size:20px;
+				position: absolute;
+				bottom:30px;
+				z-index:10000;
+				color:white;
+				color:#999;
+				font-family: times new roman;
+				font-style: italic;
+			}
+
+		</style>
+		
+	</head>
+	<body ng-app="Prezi" ng-cloak>
+
+		<div class="container-fluid" ng-controller="SlidesController">
+
+			<ul class="slides unstyled"  on-keyup on-right="next()" on-left="previous()" >
+				<li  ng-repeat="slide in slides" ng-show="slide.active">
+					<div class="content">
+						<hgroup>
+							<h1 ng-show="slide.title" ng-model="slide.title" contenteditable></h1>
+							<h3 ng-show="slide.subtitle" ng-model="slide.subtitle" contenteditable></h3>
+						</hgroup>
+
+						<img ng-show="slide.image" ng-src="{{slide.image}}" />
+
+						<ul class="bullets" ng-show="slide.bullets.length > 0">
+							<li ng-repeat="b in slide.bullets" ng-model="b" contenteditable></li>
+						<ul>			
+					</div>
+				</li>
+			</ul>
+
+			<div class='total-pages'>{{index+1}} of {{slides.length}}</div>
+		</div>
+
+	
+		<script src="angular.min.js"></script>
+		<script>
+			(function() {
+				window.prez = angular.module("Prezi", [], function($routeProvider) {
+					$routeProvider.when('/slide/:slideId', {});
+				});
+				
+				prez.directive('onKeyup', function($window) {
+				  return function(scope, elm, attrs) {
+				    angular.element($window).bind("keyup", function($$event) {
+				      scope.$apply($$event.keyCode === 39 && attrs.onRight ||
+				      	$$event.keyCode === 37 && attrs.onLeft);
+				    });
+				  };
+				});
+
+				prez.directive('contenteditable', function() {
+				    return {
+				      restrict: 'A', 
+				      require: '?ngModel', 
+				      link: function(scope, element, attrs, ngModel) {
+				        if(!ngModel) return; 
+
+				        ngModel.$render = function() {
+				          element.html(ngModel.$viewValue || '');
+				        };
+
+				        element.bind('blur keyup change', function() {
+				          scope.$apply(function() {
+				          	ngModel.$setViewValue(element.html());
+				          });
+				        });
+				        
+				        ngModel.$render();
+				      }
+				    };
+				});
+
+				prez.service("Slides", function() {
+					var slides = [
+									{
+										title:"Re-inventing the 'App'",
+										subtitle: "art rivilis"
+									},
+									{
+										title: "Who is Art?",
+										subtitle: "art@sneakpeeq.com",
+										bullets: [
+											"head of engineering @sneakpeeq",
+											"scalability engineer at @flixster",
+											"guilty pleasure: javascript ",
+											"cal grad (boo)"
+										]
+									},
+									{
+										title: "What is sneakpeeq?",
+										subtitle: "heroku for commerce",
+										bullets: [
+											"big data + e-commerce:",
+											"fulfillment / operations / marketing",
+											"UI: experiment + psychology"
+										]
+									},
+									{
+										title: "Why re-invent?",
+										image: "history.png",
+										bullets: [
+											"HTML was created in 1989",
+											"Javascript 1995",
+											"AJAX in 2005"
+										]
+									},
+									{
+										title: "Top 3 Contenders",
+										bullets: [
+											"backbonejs: first, flexible",
+											"emberjs: opinionaed, but with bad docs",
+											"angularjs: backed by google",
+											"see todomvc"
+										]
+									},
+									{
+										image: "monkey.jpg"
+									},
+									{
+										title: "Let's Focus on AngularJS",
+										bullets: [
+											"backed by google",
+											"fastest growing framework via github",
+											"designed with the future of the web in mind",
+											"no messy getters and setters",
+											"support for form validation",
+											"designed with testing in mind"
+										]
+									},
+									{
+										title: "But, first some concepts",
+										bullets: [
+											"controllers",
+											"models",
+											"views"
+										]
+									},
+									{
+										title: "How These Relate to the Web",
+										bullets: [
+											"View = HTML (declarative) / CSS",
+											"Models = Javascript Objects",
+											"Controllers = Imperative Javascript, great for behavior",
+											"allows for clean separation of concerns"
+										]
+									},
+									{
+										image: "mvc.png"
+									},
+									{
+										title: "Controllers",
+										
+										image: "controller.png"
+									},
+									{
+										title:"Views",
+										image: "view.png"
+									},
+									{ 
+										title:"Models",
+										image: "model.png"
+									},
+									{
+										title: "Problem",
+										subtitle: "HTML is limited"
+									},
+									{
+										title: "Solution: Directives",
+										image: "directive.png"
+									},
+									{
+										title: "How does the magic happen?",
+										subtitle: "a few ways"
+									},
+									{
+										title: "Dirty-checking",
+										image:"concept.png"
+									},
+
+									{
+										title: "Thanks!",
+										subtitle: "we're hiring!",
+										bullets: [
+											"art@sneakpeeq.com"
+										]
+									}
+
+								];
+
+						//!localStorage.getItem("slides") &&
+							localStorage.setItem("slides", JSON.stringify(slides));
+					return {
+						find: function() {
+							return JSON.parse(localStorage.getItem("slides"));
+						}, 
+						update: function(obj) {
+							localStorage.setItem("slides", JSON.stringify(obj));
+						}
+					};
+				});
+
+				prez.controller("SlidesController", function($scope, $location, $routeParams, Slides) {
+					
+					$scope.slides = Slides.find();
+					$scope.slides[$scope.index = 0].active = true;
+					
+					$scope.$watch("slides", function() {
+						Slides.update($scope.slides);
+					}, true);
+
+					$scope.next = function() {
+						if($scope.slides.length - 1 > $scope.index) {
+							$scope.slides[$scope.index].active = false;
+							$scope.slides[++$scope.index].active = true;
+						}
+					}
+
+					$scope.previous = function() {
+						if($scope.index > 0) {
+							$scope.slides[$scope.index].active = false;
+							$scope.slides[--$scope.index].active = true;	
+						}
+					}
+				});
+			})();
+		</script>
+	</body>
+</html>
