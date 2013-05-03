@@ -26,13 +26,6 @@
 				font-style: italic;
 				
 			}
-			form {
-				margin-top:50px;
-			}
-			form input {
-				padding:20px !important;
-				font-size:20px !important;
-			}
 			ul.slides {
 				margin:0;
 				font-size:50px;
@@ -84,23 +77,15 @@
 
 		<div class="container-fluid" ng-controller="SlidesController">
 
-			<ul class="slides unstyled"  on-keyup on-right="next()" on-left="previous()" on-delete="delete()" >
+			<ul class="slides unstyled"  on-keyup on-right="next()" on-left="previous()" >
 				<li  ng-repeat="slide in slides" ng-show="slide.active">
 					<div class="content">
 						<hgroup>
 							<h1 ng-show="slide.title" ng-model="slide.title" contenteditable></h1>
 							<h3 ng-show="slide.subtitle" ng-model="slide.subtitle" contenteditable></h3>
-							<div ng-show="slide.example"><input ng-model="slide.title" /></div>
 						</hgroup>
 
 						<img ng-show="slide.image" ng-src="{{slide.image}}" />
-
-						<form ng-show="slide.example" ng-submit="create()">
-							<div><input  class="input-xxlarge" type="text" ng-model="$parent.newslide.title" placeholder="Some Title" /></div>
-							<div><input  class="input-xxlarge" type="text" ng-model="$parent.newslide.subtitle" placeholder="subtitle" /></div>
-							<button type="submit" class="btn">Create</button>
-						</form>
-
 
 						<ul class="bullets" ng-show="slide.bullets.length > 0">
 							<li ng-repeat="b in slide.bullets" ng-model="b" contenteditable></li>
@@ -124,8 +109,7 @@
 				  return function(scope, elm, attrs) {
 				    angular.element($window).bind("keyup", function($$event) {
 				      scope.$apply($$event.keyCode === 39 && attrs.onRight ||
-				      	$$event.keyCode === 37 && attrs.onLeft ||
-				      	$$event.ctrlKey && $$event.keyCode === 46 && attrs.onDelete);
+				      	$$event.keyCode === 37 && attrs.onLeft);
 				    });
 				  };
 				});
@@ -251,12 +235,8 @@
 										image: "directive.png"
 									},
 									{
-										title: "Solution: Directives",
-										image: "hide.png"
-									},
-									{
 										title: "How does the magic happen?",
-										example: true
+										subtitle: "a few ways"
 									},
 									{
 										title: "Dirty-checking",
@@ -291,8 +271,6 @@
 					};
 				});
 
-
-
 				prez.controller("SlidesController", function($scope, $location, $routeParams, Slides) {
 					
 					$scope.slides = Slides.find();
@@ -314,15 +292,6 @@
 							$scope.slides[$scope.index].active = false;
 							$scope.slides[--$scope.index].active = true;	
 						}
-					}
-
-					$scope.delete = function() {
-						$scope.slides.splice($scope.index,1);
-						$scope.next();
-					}
-
-					$scope.create = function() {
-						$scope.slides.push($scope.newslide);
 					}
 				});
 			})();
